@@ -1,3 +1,4 @@
+# Import necessary libraries
 import sys
 from dataclasses import dataclass
 import numpy as np
@@ -12,12 +13,12 @@ import os
 import numpy as np
 from src.utils import save_object
 
-
+# Define a data class for configuration settings
 @dataclass
 class DataTransformationConfig:
     preprocessed_file_path = os.path.join("artifacts", "proprocessed.pkl")
 
-
+# Define the main class for data transformation
 class DataTransformation:
     def __init__(self):
         """
@@ -33,6 +34,7 @@ class DataTransformation:
             ColumnTransformer: Preprocessor for data transformation.
         """
         try:
+            # Define numerical and categorical columns
             num_columns = ["writing_score", "reading_score"]
             categ_columns = [
                 "gender",
@@ -42,6 +44,7 @@ class DataTransformation:
                 "test_preparation_course"
             ]
 
+            # Create pipelines for numerical and categorical data
             num_pipeline = make_pipeline(SimpleImputer(strategy="median"),
                                          StandardScaler())
 
@@ -53,17 +56,16 @@ class DataTransformation:
 
             logging.info("Categorical columns encoding completed")
 
-            preprocessor=ColumnTransformer(
+            # Combine numerical and categorical pipelines into a ColumnTransformer
+            preprocessor = ColumnTransformer(
                 [
-                ("num_pipeline",num_pipeline,num_columns),
-                ("cat_pipelines",categ_pipeline,categ_columns)
+                ("num_pipeline", num_pipeline, num_columns),
+                ("cat_pipelines", categ_pipeline, categ_columns)
                 ]
-
             )
 
             return preprocessor
-        
-        
+
         except Exception as e:
             raise CustomException(e, sys)
 
@@ -79,6 +81,7 @@ class DataTransformation:
             tuple: Transformed training array, transformed testing array, and preprocessed file path.
         """
         try:
+            # Read training and testing data
             train_df = pd.read_csv(train_path)
             test_df = pd.read_csv(test_path)
 
@@ -86,11 +89,13 @@ class DataTransformation:
 
             logging.info("Obtaining preprocessing object")
 
+            # Get the data transformer object
             preprocessing_obj = self.get_data_transformer_object()
 
             target_column_name = "math_score"
             numerical_columns = ["writing_score", "reading_score"]
 
+            # Separate input and target features for training and testing data
             input_feature_train_df = train_df.drop(columns=[target_column_name], axis=1)
             target_feature_train_df = train_df[target_column_name]
 
@@ -99,9 +104,11 @@ class DataTransformation:
 
             logging.info("Applying preprocessing object to training and testing dataframes.")
 
+            # Apply the preprocessing object to training and testing data
             input_feature_train_arr = preprocessing_obj.fit_transform(input_feature_train_df)
             input_feature_test_arr = preprocessing_obj.transform(input_feature_test_df)
 
+            # Combine input features with target features
             train_arr = np.c_[
                 input_feature_train_arr, np.array(target_feature_train_df)
             ]
@@ -112,6 +119,7 @@ class DataTransformation:
 
             logging.info("Saved preprocessing object.")
 
+            # Save the preprocessing object
             save_object(
                 file_path=self.data_transformation_config.preprocessed_file_path,
                 obj=preprocessing_obj
@@ -121,5 +129,3 @@ class DataTransformation:
 
         except Exception as e:
             raise CustomException(e, sys)
-        
-        
