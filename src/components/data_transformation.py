@@ -16,7 +16,7 @@ from src.utils import save_object
 # Define a data class for configuration settings
 @dataclass
 class DataTransformationConfig:
-    preprocessed_file_path = os.path.join("artifacts", "proprocessed.pkl")
+    preprocessor_file_path = os.path.join("artifacts", "preprocessor.pkl")
 
 # Define the main class for data transformation
 class DataTransformation:
@@ -121,11 +121,11 @@ class DataTransformation:
 
             # Save the preprocessing object
             save_object(
-                file_path=self.data_transformation_config.preprocessed_file_path,
+                file_path=self.data_transformation_config.preprocessor_file_path,
                 obj=preprocessing_obj
             )
 
-            return train_arr, test_arr, self.data_transformation_config.preprocessed_file_path
+            return train_arr, test_arr, self.data_transformation_config.preprocessor_file_path
 
         except Exception as e:
             raise CustomException(e, sys)
