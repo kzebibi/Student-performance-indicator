@@ -40,7 +40,7 @@ def predict_datapoint():
         return render_template('home.html', results=results[0])  # Render the home.html template with results
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)  # Run the Flask application
+    app.run(host='0.0.0.0', port=8080)  # Run the Flask application
     
     
 # go to  http://127.0.0.1:5000/predictdata
